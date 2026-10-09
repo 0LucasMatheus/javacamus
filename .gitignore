@@ -1,0 +1,17 @@
+/target/
+
+.mvn
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# Segredos locais (nao commitar)
+.env
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

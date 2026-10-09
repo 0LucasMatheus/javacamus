@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Usuário</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a th:href="@{/admin/usuarios}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="fw-bold mb-0">
+            <span th:text="${usuario.id != null} ? 'Editar Usuário' : 'Novo Usuário'"></span>
+        </h2>
+    </div>
+
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+    <div class="card shadow-sm" style="max-width: 540px;">
+        <div class="card-body p-4">
+
+            <!-- mesmo form serve pra criar e editar, muda a action e o texto do botao conforme tem id ou nao -->
+            <form th:action="${usuario.id != null}
+                        ? @{/admin/usuarios/editar/{id}(id=${usuario.id})}
+                        : @{/admin/usuarios/salvar}"
+                  th:object="${usuario}"
+                  method="post">
+
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-medium">
+                        <i class="bi bi-person me-1"></i>Username
+                    </label>
+                    <input type="text"
+                           id="username"
+                           class="form-control"
+                           th:field="*{username}"
+                           placeholder="Ex: joao.silva"
+                           required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-medium">
+                        <i class="bi bi-envelope me-1"></i>E-mail
+                    </label>
+                    <input type="email"
+                           id="email"
+                           class="form-control"
+                           th:field="*{email}"
+                           placeholder="Ex: joao.silva@email.com"
+                           required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-medium">
+                        <i class="bi bi-lock me-1"></i>Senha
+                        <small class="text-muted fw-normal" th:if="${usuario.id != null}">
+                            — deixe em branco para manter a atual
+                        </small>
+                    </label>
+                    <input type="password"
+                           id="password"
+                           class="form-control"
+                           th:field="*{password}"
+                           placeholder="••••••••"
+                           th:required="${usuario.id == null}"/>
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="form-label fw-medium">
+                        <i class="bi bi-shield me-1"></i>Perfil
+                    </label>
+                    <select id="role" class="form-select" th:field="*{role}" required>
+                        <option value="">Selecione um perfil</option>
+                        <!-- roles vem prontas do controller, se criar uma role nova ja aparece aqui sozinho -->
+                        <option th:each="role : ${roles}"
+                                th:value="${role}" th:text="${role}"></option>
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>
+                        <span th:text="${usuario.id != null} ? 'Salvar Alterações' : 'Criar Usuário'"></span>
+                    </button>
+                    <a th:href="@{/admin/usuarios}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

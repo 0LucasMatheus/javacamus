@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <meta charset="UTF-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    </head>
+    <body>
+        <!-- esse fragmento e incluido no layout.html, mesma sidebar em toda pagina interna -->
+        <div th:fragment="sidebar">
+            <div id="sidebar">
+                <h4 class="text-center py-3">Javacamus</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="bi bi-house"></i><span class="d-none d-md-inline ms-1">Home</span>
+                        </a>
+                    </li>
+                    <!-- cada link so aparece se o usuario logado tiver a role, sec:authorize cuida disso -->
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="nav-link" th:href="@{/usuario/painel}">
+                            <i class="bi bi-person"></i><span class="d-none d-md-inline ms-1">Minha área</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
+                        <a class="nav-link" th:href="@{/moderator/painel}">
+                            <i class="bi bi-shield-check"></i><span class="d-none d-md-inline ms-1">Moderação</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin/usuarios}">
+                            <i class="bi bi-people-fill"></i><span class="d-none d-md-inline ms-1">Usuários</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

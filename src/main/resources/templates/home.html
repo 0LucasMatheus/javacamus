@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Home</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <h1>Bem-vindo(a)!</h1>
+    <p class="text-muted">Você está logado como <span sec:authentication="name"></span>.</p>
+
+    <!-- card condicional por role -->
+    <div class="row g-3 mt-2">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people-fill text-danger me-1"></i>Administração</h5>
+                    <p class="card-text">Gerencie os usuários e os perfis de acesso do sistema.</p>
+                    <a th:href="@{/admin/usuarios}" class="btn btn-sm btn-outline-danger">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-shield-check text-warning me-1"></i>Moderação</h5>
+                    <p class="card-text">Área exclusiva para moderadores do sistema.</p>
+                    <a th:href="@{/moderator/painel}" class="btn btn-sm btn-outline-warning">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" sec:authorize="hasRole('USER')">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-person text-primary me-1"></i>Minha área</h5>
+                    <p class="card-text">Área padrão para usuários comuns.</p>
+                    <a th:href="@{/usuario/painel}" class="btn btn-sm btn-outline-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
