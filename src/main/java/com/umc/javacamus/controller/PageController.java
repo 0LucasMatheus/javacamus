@@ -2,7 +2,9 @@ package com.umc.javacamus.controller;
 
 import com.umc.javacamus.entity.Role;
 import com.umc.javacamus.entity.Usuario;
+import com.umc.javacamus.service.DashboardService;
 import com.umc.javacamus.service.UsuarioService;
+import java.security.Principal;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 // controller das paginas do sistema, so monta tela, quem faz a regra de negocio e o UsuarioService
@@ -17,9 +20,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class PageController {
 
     private final UsuarioService usuarioService;
+    private final DashboardService dashboardService;
 
-    public PageController(UsuarioService usuarioService) {
+    public PageController(UsuarioService usuarioService, DashboardService dashboardService) {
         this.usuarioService = usuarioService;
+        this.dashboardService = dashboardService;
     }
 
     @GetMapping("/login")
@@ -32,8 +37,18 @@ public class PageController {
         return "acesso-negado";
     }
 
+    // home e o dashboard, tecnico e admin veem tudo e o usuario so os chamados dele
     @GetMapping("/")
-    public String home() {
+    public String home(@RequestParam(defaultValue = "30") int dias, Principal principal, Model model) {
+        if (dias != 7 && dias != 30 && dias != 90) {
+            dias = 30;
+        }
+        model.addAttribute("dias", dias);
+        try {
+            model.addAttribute("resumo", dashboardService.resumo(principal.getName(), dias));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("erro", e.getMessage());
+        }
         return "home";
     }
 

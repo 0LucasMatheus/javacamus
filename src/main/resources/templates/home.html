@@ -2,44 +2,201 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
-    <title>Home</title>
+    <title>Dashboard</title>
 </head>
 <body>
 
 <div layout:fragment="content">
-    <h1>Bem-vindo(a)!</h1>
-    <p class="text-muted">Você está logado como <span sec:authentication="name"></span>.</p>
 
-    <!-- card condicional por role -->
-    <div class="row g-3 mt-2">
-        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-people-fill text-danger me-1"></i>Administração</h5>
-                    <p class="card-text">Gerencie os usuários e os perfis de acesso do sistema.</p>
-                    <a th:href="@{/admin/usuarios}" class="btn btn-sm btn-outline-danger">Acessar</a>
-                </div>
-            </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold mb-0"><i class="bi bi-graph-up me-2 text-primary"></i>Dashboard</h2>
+            <small class="text-muted" sec:authorize="hasRole('USER')">Seus chamados</small>
+            <small class="text-muted" sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">Todos os chamados</small>
         </div>
-        <div class="col-md-4" sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-shield-check text-warning me-1"></i>Moderação</h5>
-                    <p class="card-text">Área exclusiva para moderadores do sistema.</p>
-                    <a th:href="@{/moderator/painel}" class="btn btn-sm btn-outline-warning">Acessar</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4" sec:authorize="hasRole('USER')">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-person text-primary me-1"></i>Minha área</h5>
-                    <p class="card-text">Área padrão para usuários comuns.</p>
-                    <a th:href="@{/usuario/painel}" class="btn btn-sm btn-outline-primary">Acessar</a>
-                </div>
-            </div>
+        <!-- periodo vai na url, o controller so aceita 7, 30 ou 90 -->
+        <div class="btn-group btn-group-sm">
+            <a th:href="@{/(dias=7)}" class="btn" th:classappend="${dias == 7} ? 'btn-secondary' : 'btn-outline-secondary'">7 dias</a>
+            <a th:href="@{/(dias=30)}" class="btn" th:classappend="${dias == 30} ? 'btn-secondary' : 'btn-outline-secondary'">30 dias</a>
+            <a th:href="@{/(dias=90)}" class="btn" th:classappend="${dias == 90} ? 'btn-secondary' : 'btn-outline-secondary'">90 dias</a>
         </div>
     </div>
+
+    <div class="alert alert-danger" th:if="${erro}">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${erro}"></span>
+    </div>
+
+    <th:block th:if="${resumo != null}">
+
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small"><i class="bi bi-headset me-1"></i>Chamados</div>
+                        <div class="fs-3 fw-bold" th:text="${resumo.total}">0</div>
+                        <div class="small text-muted">abertos no período</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>Em aberto</div>
+                        <div class="fs-3 fw-bold text-warning" th:text="${resumo.abertos}">0</div>
+                        <div class="small text-muted">esperando técnico</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small"><i class="bi bi-check-circle me-1"></i>Resolvidos</div>
+                        <div class="fs-3 fw-bold text-success" th:text="${resumo.resolvidos}">0</div>
+                        <div class="small text-muted"><span th:text="${resumo.taxaResolucao}">0</span>% dos chamados</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small"><i class="bi bi-stopwatch me-1"></i>Tempo médio</div>
+                        <div class="fs-3 fw-bold" th:text="${resumo.tempoMedio}">-</div>
+                        <div class="small text-muted">da abertura até resolver</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Chamados por dia</h6>
+                        <div style="height: 280px">
+                            <canvas id="graficoDias"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Situação</h6>
+                        <div style="height: 280px" class="position-relative">
+                            <canvas id="graficoStatus" th:if="${resumo.total > 0}"></canvas>
+                            <div class="h-100 d-flex align-items-center justify-content-center text-muted" th:if="${resumo.total == 0}">
+                                Nenhum chamado no período.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">Últimos chamados</h6>
+                            <a th:href="@{/chamados}" class="small">ver todos</a>
+                        </div>
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Solicitante</th>
+                                    <th>Abertura</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(resumo.ultimos)}">
+                                    <td colspan="4" class="text-center text-muted py-3">Nenhum chamado no período.</td>
+                                </tr>
+                                <tr th:each="chamado : ${resumo.ultimos}">
+                                    <td><a th:href="@{/chamados/{id}(id=${chamado.id})}" th:text="${chamado.titulo}"></a></td>
+                                    <td th:text="${chamado.solicitanteNome}"></td>
+                                    <td class="text-muted" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM HH:mm')}"></td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark" th:if="${!chamado.resolvido}">ABERTO</span>
+                                        <span class="badge bg-success" th:if="${chamado.resolvido}">RESOLVIDO</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-2">Resolvidos por técnico</h6>
+                        <table class="table table-sm align-middle mb-0">
+                            <tbody>
+                                <tr th:if="${resumo.resolvidosPorTecnico.isEmpty()}">
+                                    <td class="text-center text-muted py-3">Nenhum chamado resolvido.</td>
+                                </tr>
+                                <tr th:each="item : ${resumo.resolvidosPorTecnico}">
+                                    <td><i class="bi bi-person-gear me-1 text-muted"></i><span th:text="${item.key}"></span></td>
+                                    <td class="text-end fw-bold" th:text="${item.value}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script th:inline="javascript">
+            const dias = /*[[${resumo.diasGrafico}]]*/ [];
+            const abertosPorDia = /*[[${resumo.abertosPorDia}]]*/ [];
+            const resolvidosPorDia = /*[[${resumo.resolvidosPorDia}]]*/ [];
+            const abertos = /*[[${resumo.abertos}]]*/ 0;
+            const resolvidos = /*[[${resumo.resolvidos}]]*/ 0;
+
+            const AMARELO = '#e0a800';
+            const VERDE = '#198754';
+
+            new Chart(document.getElementById('graficoDias'), {
+                type: 'bar',
+                data: {
+                    labels: dias,
+                    datasets: [
+                        { label: 'Abertos', data: abertosPorDia, backgroundColor: AMARELO, borderRadius: 4 },
+                        { label: 'Resolvidos', data: resolvidosPorDia, backgroundColor: VERDE, borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+
+            // so desenha a rosca se tiver chamado, senao o canvas nem existe
+            const canvasStatus = document.getElementById('graficoStatus');
+            if (canvasStatus) {
+                new Chart(canvasStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Em aberto', 'Resolvidos'],
+                        datasets: [{ data: [abertos, resolvidos], backgroundColor: [AMARELO, VERDE], borderWidth: 2 }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        </script>
+    </th:block>
+
 </div>
 
 </body>
