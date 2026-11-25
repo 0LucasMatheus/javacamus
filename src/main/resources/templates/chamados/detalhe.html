@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Chamado</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a th:href="@{/chamados}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="fw-bold mb-0" th:text="${chamado.titulo}">Chamado</h2>
+        <span class="badge bg-warning text-dark" th:if="${!chamado.resolvido}">ABERTO</span>
+        <span class="badge bg-success" th:if="${chamado.resolvido}">RESOLVIDO</span>
+    </div>
+
+    <div class="alert alert-success alert-dismissible fade show" th:if="${sucesso}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${sucesso}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${erro}" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${erro}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h6 class="text-muted text-uppercase small">Descrição</h6>
+                    <p style="white-space: pre-line;" th:text="${chamado.descricao}"></p>
+
+                    <div class="row small mt-4">
+                        <div class="col-6">
+                            <div class="text-muted">Solicitante</div>
+                            <div class="fw-medium" th:text="${chamado.solicitanteNome}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">Abertura</div>
+                            <div class="fw-medium" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <!-- ja resolvido mostra a solucao -->
+            <div class="card shadow-sm border-success h-100" th:if="${chamado.resolvido}">
+                <div class="card-body p-4">
+                    <h6 class="text-success text-uppercase small"><i class="bi bi-check-circle-fill me-1"></i>Solução</h6>
+                    <p style="white-space: pre-line;" th:text="${chamado.solucao}"></p>
+                    <div class="row small mt-4">
+                        <div class="col-6">
+                            <div class="text-muted">Técnico</div>
+                            <div class="fw-medium" th:text="${chamado.tecnicoNome}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">Resolvido em</div>
+                            <div class="fw-medium" th:text="${#temporals.format(chamado.dataResolucao, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- aberto e quem pode resolver ve o form -->
+            <div class="card shadow-sm h-100" th:if="${!chamado.resolvido and podeResolver}">
+                <div class="card-body p-4">
+                    <h6 class="text-muted text-uppercase small">Resolver chamado</h6>
+                    <form th:action="@{/chamados/{id}/resolver(id=${chamado.id})}" method="post">
+                        <textarea name="solucao" class="form-control mb-3" rows="5"
+                                  placeholder="Descreva a solução aplicada" required></textarea>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg me-1"></i> Resolver
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm h-100" th:if="${!chamado.resolvido and !podeResolver}">
+                <div class="card-body p-4 text-muted">
+                    <i class="bi bi-hourglass-split me-1"></i> Aguardando um técnico resolver.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

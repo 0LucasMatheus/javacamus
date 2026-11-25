@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Chamados</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">
+            <i class="bi bi-headset me-2 text-primary"></i>Chamados
+        </h2>
+        <a th:href="@{/chamados/novo}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Abrir Chamado
+        </a>
+    </div>
+
+    <div class="alert alert-success alert-dismissible fade show" th:if="${sucesso}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${sucesso}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${erro}" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${erro}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- filtro por status, so troca o ?status= da url -->
+    <div class="btn-group btn-group-sm mb-3">
+        <a th:href="@{/chamados}" class="btn"
+           th:classappend="${status == null or status == ''} ? 'btn-secondary' : 'btn-outline-secondary'">Todos</a>
+        <a th:href="@{/chamados(status='ABERTO')}" class="btn"
+           th:classappend="${status == 'ABERTO'} ? 'btn-warning' : 'btn-outline-warning'">Abertos</a>
+        <a th:href="@{/chamados(status='RESOLVIDO')}" class="btn"
+           th:classappend="${status == 'RESOLVIDO'} ? 'btn-success' : 'btn-outline-success'">Resolvidos</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="ps-4">Título</th>
+                        <th scope="col" th:if="${podeResolver}">Solicitante</th>
+                        <th scope="col">Abertura</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Técnico</th>
+                        <th scope="col" class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(chamados)}">
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            Nenhum chamado por aqui.
+                        </td>
+                    </tr>
+                    <tr th:each="chamado : ${chamados}">
+                        <td class="ps-4 fw-medium" th:text="${chamado.titulo}"></td>
+                        <td th:if="${podeResolver}" th:text="${chamado.solicitanteNome}"></td>
+                        <td class="text-muted" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span class="badge bg-warning text-dark" th:if="${!chamado.resolvido}">ABERTO</span>
+                            <span class="badge bg-success" th:if="${chamado.resolvido}">RESOLVIDO</span>
+                        </td>
+                        <td class="text-muted" th:text="${chamado.tecnicoNome != null} ? ${chamado.tecnicoNome} : '-'"></td>
+                        <td class="text-end pe-4">
+                            <a th:href="@{/chamados/{id}(id=${chamado.id})}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye-fill"></i> Ver
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted small" th:if="${!#lists.isEmpty(chamados)}">
+            Total: <strong th:text="${#lists.size(chamados)}"></strong> chamado(s)
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
