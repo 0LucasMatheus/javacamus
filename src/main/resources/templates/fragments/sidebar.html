@@ -21,16 +21,6 @@
                         </a>
                     </li>
                     <!-- cada link so aparece se o usuario logado tiver a role, sec:authorize cuida disso -->
-                    <li class="nav-item" sec:authorize="hasRole('USER')">
-                        <a class="nav-link" th:href="@{/usuario/painel}">
-                            <i class="bi bi-person"></i><span class="d-none d-md-inline ms-1">Minha área</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
-                        <a class="nav-link" th:href="@{/moderator/painel}">
-                            <i class="bi bi-shield-check"></i><span class="d-none d-md-inline ms-1">Moderação</span>
-                        </a>
-                    </li>
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                         <a class="nav-link" th:href="@{/admin/usuarios}">
                             <i class="bi bi-people-fill"></i><span class="d-none d-md-inline ms-1">Usuários</span>
