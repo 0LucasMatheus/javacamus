@@ -55,12 +55,16 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable String id) {
+    public ResponseEntity<?> deletarUsuario(@PathVariable String id) {
         Usuario usuario = usuarioService.buscarPorId(id).orElse(null);
         if (usuario == null) {
             return ResponseEntity.notFound().build();
         }
-        usuarioService.deletarUsuario(id);
+        try {
+            usuarioService.deletarUsuario(id);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.noContent().build();
     }
 }

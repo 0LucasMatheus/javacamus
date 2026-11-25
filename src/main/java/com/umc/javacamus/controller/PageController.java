@@ -110,8 +110,12 @@ public class PageController {
     @PostMapping("/admin/usuarios/deletar/{id}")
     public String deletarUsuario(@PathVariable String id,
             RedirectAttributes redirectAttributes) {
-        usuarioService.deletarUsuario(id);
-        redirectAttributes.addFlashAttribute("sucesso", "Usuário removido com sucesso!");
+        try {
+            usuarioService.deletarUsuario(id);
+            redirectAttributes.addFlashAttribute("sucesso", "Usuário removido com sucesso!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
         return "redirect:/admin/usuarios";
     }
 }
