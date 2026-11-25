@@ -15,3 +15,9 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+# arquivos que o vscode/eclipse gera
+.classpath
+.factorypath
+.project
+.settings
