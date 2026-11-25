@@ -56,6 +56,7 @@
             <div class="mt-3">
                 <a th:href="@{/recuperar-senha}" class="text-decoration-none">Esqueceu sua senha?</a>
             </div>
+            <small class="text-muted d-block mt-3" th:text="'v' + ${@environment.getProperty('app.versao')}">v1.0.0</small>
         </div>
     </div>
 

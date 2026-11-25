@@ -37,6 +37,8 @@
                         </a>
                     </li>
                 </ul>
+                <!-- versao do pom, ver o readme -->
+                <small class="d-block text-center text-white-50 mt-4" th:text="'v' + ${@environment.getProperty('app.versao')}">v1.0.0</small>
             </div>
         </div>
     </body>

@@ -14,7 +14,7 @@
 
     <groupId>com.umc</groupId>
     <artifactId>javacamus</artifactId>
-    <version>0.4.1</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>javacamus</name>
 
