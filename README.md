@@ -10,6 +10,19 @@
 
 ## 🌳 Sobre o projeto
 
+link de deploy: [javacamus](https://javacamus.gardiencor.app.br)
+
+credenciais de testes:
+
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+
+TECNICO_USERNAME=tecnico
+TECNICO_PASSWORD=tecnico123
+
+USUARIO_USERNAME=usuario
+USUARIO_PASSWORD=usuario123
+
 Javacamus é um sistema de **controle de chamados técnicos** feito com **Java + Spring Boot**, **Thymeleaf** e **MongoDB Atlas**, baseado no Thindesk apresentado em sala.
 
 Ele começou como um template de autenticação e autorização (login, logout, recuperação de senha, cadastro de usuários e controle de acesso por perfil com **Spring Security**) e agora está integrado ao microserviço [chamados-ms](https://github.com/0LucasMatheus/chamados-ms), que cuida da abertura, consulta e resolução dos chamados.
