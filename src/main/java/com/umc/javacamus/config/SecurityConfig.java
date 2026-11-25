@@ -53,7 +53,7 @@ public class SecurityConfig {
                 // csrf fica ligado em tudo, so ignora na api que e consumida por fora
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/recuperar-senha", "/recuperar-senha/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/login", "/recuperar-senha", "/recuperar-senha/**", "/css/**", "/js/**", "/images/**", "/peixe-cafe.jpg").permitAll()
                         .requestMatchers("/admin/**", "/api/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/moderator/**").hasAnyRole("ADMIN", "MODERATOR")
                         .requestMatchers("/usuario/**").hasAnyRole("ADMIN", "MODERATOR", "USER")
